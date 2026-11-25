@@ -15,6 +15,8 @@ class Submission extends Model
         'assignment_id',
         'user_id',
         'jawaban',
+        'nilai',
+        'catatan_dosen',
         'submitted_at',
     ];
 
@@ -36,6 +38,10 @@ class Submission extends Model
     public function getStatusNilaiAttribute(): string
     {
         // TODO 2: Lengkapi logika status nilai ('Belum Dinilai' jika null, 'Lulus' jika >= 70, selain itu 'Perlu Perbaikan')
-        return '';
+        if (is_null($this->nilai)) {
+            return 'Belum Dinilai';
+        }
+
+        return $this->nilai >= 70 ? 'Lulus' : 'Perlu Perbaikan';
     }
 }

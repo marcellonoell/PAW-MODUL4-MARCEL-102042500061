@@ -63,5 +63,76 @@ class DatabaseSeeder extends Seeder
         );
 
         // TODO 8: Tambahkan minimal 2 mata kuliah lagi dengan semester berbeda, 1 mahasiswa tambahan, 2 tugas, dan contoh data submission
+        $mahasiswa2 = User::updateOrCreate(
+            ['email' => 'siti@celoe.test'],
+            [
+                'name' => 'Siti Nurhaliza',
+                'password' => Hash::make('mahasiswa123'),
+                'role' => 'mahasiswa',
+                'nomor_induk' => '1301210002',
+            ]
+        );
+
+        $course2 = MataKuliah::updateOrCreate(
+            ['kode_mk' => 'IF204'],
+            [
+                'nama_mk' => 'Basis Data Relasional',
+                'deskripsi' => 'Mata kuliah perancangan basis data relasional, normalisasi, ERD, dan optimasi query SQL.',
+                'sks' => 3,
+                'semester' => 'Ganjil 2026/2027',
+                'dosen_id' => $dosen->id,
+            ]
+        );
+
+        $course3 = MataKuliah::updateOrCreate(
+            ['kode_mk' => 'IF402'],
+            [
+                'nama_mk' => 'Arsitektur Layanan Awan',
+                'deskripsi' => 'Mata kuliah yang membahas konsep cloud computing, virtualisasi, containerization, dan deployment aplikasi skala besar.',
+                'sks' => 3,
+                'semester' => 'Genap 2026/2027',
+                'dosen_id' => $dosen->id,
+            ]
+        );
+
+        $course1->students()->syncWithoutDetaching([
+            $mahasiswa2->id => ['status' => 'approved'],
+        ]);
+
+        $course2->students()->syncWithoutDetaching([
+            $mahasiswa1->id => ['status' => 'approved'],
+        ]);
+
+        $assignment1 = Assignment::updateOrCreate(
+            ['course_id' => $course1->id, 'judul' => 'Tugas 1: Implementasi Middleware & Eloquent ORM'],
+            [
+                'deskripsi' => 'Jelaskan cara kerja Route Middleware untuk proteksi peran pengguna serta implementasi relasi Eloquent pada studi kasus CeLOE LMS.',
+                'deadline' => now()->addDays(5),
+            ]
+        );
+
+        $assignment2 = Assignment::updateOrCreate(
+            ['course_id' => $course1->id, 'judul' => 'Tugas 2: Implementasi Ekspor Rekapitulasi Nilai CSV'],
+            [
+                'deskripsi' => 'Buatlah fitur ekspor laporan nilai mahasiswa ke dalam format file CSV menggunakan response stream di Laravel.',
+                'deadline' => now()->addDays(10),
+            ]
+        );
+
+        Submission::updateOrCreate(
+            ['assignment_id' => $assignment1->id, 'user_id' => $mahasiswa1->id],
+            [
+                'jawaban' => 'Middleware di Laravel berfungsi menyaring HTTP request sebelum mencapai controller. Pada CeLOE LMS, RoleMiddleware memeriksa apakah role pengguna sesuai dengan parameter route.',
+                'submitted_at' => now()->subHours(5),
+            ]
+        );
+
+        Submission::updateOrCreate(
+            ['assignment_id' => $assignment1->id, 'user_id' => $mahasiswa2->id],
+            [
+                'jawaban' => 'Route middleware berperan mengamankan akses endpoint berdasarkan peran user, sedangkan relasi Eloquent menghubungkan data antar tabel secara efisien.',
+                'submitted_at' => now()->subHours(2),
+            ]
+        );
     }
 }
